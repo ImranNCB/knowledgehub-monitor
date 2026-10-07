@@ -1,0 +1,4 @@
+monitoring.db
+measurements.csv
+__pycache__/
+*.pyc
