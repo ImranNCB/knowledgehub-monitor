@@ -1,8 +1,14 @@
+import os
+
+from dot env import load_dotenv
+
 from datetime import datetime
 
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
 
 SUPPORTED_METRICS = ["cpu", "memory", "disk"]
 
@@ -16,6 +22,10 @@ def health():
 
 @app.post("/api/v1/measurements")
 def create_measurement():
+    if not API_KEY or request.headers.get("X-API-Key") != API_KEY:
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
     data = request.get_json(silent=True)
 
     if not isinstance(data, dict):
