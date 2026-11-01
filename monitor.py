@@ -67,7 +67,7 @@ def send_measurement_to_api(measurement):
             API_URL,
             headers={"X-API-Key": API_KEY},
             json=measurement,
-            timeout=10,
+            timeout=40,
         )
     except requests.RequestException as error:
         print(f"Azure API unavailable: {error}")
