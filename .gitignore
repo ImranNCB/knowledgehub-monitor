@@ -2,3 +2,6 @@ monitoring.db
 measurements.csv
 __pycache__/
 *.pyc
+api/.venv/
+api/.env
+api/flask.log
