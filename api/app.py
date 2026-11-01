@@ -1,16 +1,18 @@
 import os
-
-from dot env import load_dotenv
-
 from datetime import datetime
 
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+
 load_dotenv()
+
 API_KEY = os.getenv("API_KEY")
 
 SUPPORTED_METRICS = ["cpu", "memory", "disk"]
+
+latest_measurement = None
 
 
 @app.get("/api/v1/health")
@@ -22,10 +24,13 @@ def health():
 
 @app.post("/api/v1/measurements")
 def create_measurement():
+    global latest_measurement
+
     if not API_KEY or request.headers.get("X-API-Key") != API_KEY:
         return jsonify({
             "error": "Unauthorized"
         }), 401
+
     data = request.get_json(silent=True)
 
     if not isinstance(data, dict):
@@ -79,10 +84,29 @@ def create_measurement():
             "error": "Value must be between 0 and 100"
         }), 400
 
+    latest_measurement = data
+
     return jsonify({
         "message": "Measurement accepted",
         "measurement": data
     }), 201
+
+
+@app.get("/api/v1/measurements/latest")
+def get_latest_measurement():
+    if not API_KEY or request.headers.get("X-API-Key") != API_KEY:
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    if latest_measurement is None:
+        return jsonify({
+            "error": "No measurements available"
+        }), 404
+
+    return jsonify({
+        "measurement": latest_measurement
+    }), 200
 
 
 if __name__ == "__main__":
