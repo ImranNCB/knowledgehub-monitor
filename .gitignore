@@ -5,3 +5,4 @@ __pycache__/
 api/.venv/
 api/.env
 api/flask.log
+*.swp
